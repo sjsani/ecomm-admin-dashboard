@@ -11,6 +11,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useParams, useRouter } from "next/navigation";
+import { AlertModal } from "@/components/models/alert-modal";
+import { ApiAlert } from "@/components/ui/api-alert";
 
 interface SettingsFormProps {
   initialData:Store;
@@ -30,20 +35,51 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
     resolver:zodResolver(formSchema),
     defaultValues: initialData
   })
+  const params = useParams()
   const[open, setOpen] = useState(false);
   const [loading,setLoading]= useState(false)
+  const router = useRouter()
 
   const onSubmit = async (data: SettingsFormValues) => {
-    console.log(data)
+    try{
+      setLoading(true)
+      await axios.patch(`/api/stores/${params.storeId}`, data);
+      router.refresh()
+      toast.success("Store Updated")
+    }catch(error){
+      toast.error("Something Went Wrong.")
+
+    }finally{
+      setLoading(false)
+    }
+  };
+  const onDelete = async()=>{
+    try{
+      setLoading(true)
+      await axios.delete(`/api/stores/${params.storeId}`)
+      router.refresh();
+      router.push("/")
+      toast.success("Store Deleted")
+    }catch(error){
+      toast.error("Make Sure you removed all products and categories first.")
+    }finally{
+      setLoading(false)
+      setOpen(false)
+    }
   }
   
   return(
     <>
+    <AlertModal
+    isOpen={open}
+    onClose={()=>setOpen(false)}
+    onConfirm={onDelete}
+    loading={loading}/>
     <div className=" flex items-center justify-between">
       <Heading 
       title="Settings"
       description="Manage Store preferences" />
-      <Button disabled={loading} variant="destructive" size="sm" onClick={()=>{}}>
+      <Button disabled={loading} variant="destructive" size="sm" onClick={()=>setOpen(true)}>
         <Trash className="h-2 w-4" />
       </Button>
       
@@ -72,6 +108,8 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
       </form>
 
     </Form>
+    <Separator />
+    <ApiAlert title="NEXT_PUBLIC_API_URL" description="test-desc" variant="public"/>
     </>
   )
 }
