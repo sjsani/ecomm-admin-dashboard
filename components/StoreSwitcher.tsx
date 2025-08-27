@@ -42,7 +42,7 @@ export default function StoreSwitcher({
   }
   return(
     <Popover>
-      <PopoverTrigger>
+      <PopoverTrigger asChild >
         <Button
           variant="outline"
           size="sm"
