@@ -30,19 +30,19 @@ const ProductPage = async ({
   const initialData = product
     ? {
         ...product,
-        price: Number(product.price), // convert Decimal → number
+        price: Number(product.price),
       }
     : null;
 
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <ProductForm
-          categories={categories}
-          colors={colors}
-          sizes={sizes}
-          initialData={initialData as any}
-        />
+          <ProductForm
+            categories={categories}
+            colors={colors}
+            sizes={sizes}
+            initialData={initialData as import("@prisma/client").Product & { images: import("@prisma/client").Image[] } | null}
+          />
       </div>
     </div>
   );
