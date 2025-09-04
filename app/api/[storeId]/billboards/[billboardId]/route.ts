@@ -1,6 +1,7 @@
 import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { deleteImage } from "@/lib/storage/client";
 export async function GET(req:Request, {params}:{params:{ billboardId:string}}) {
 
   const {billboardId} = await params;
@@ -108,9 +109,25 @@ export async function DELETE(req:Request, {params}:{params:{storeId:string, bill
       return new NextResponse("Unauthorized Access", {status:403})
       
     }
+const billboard = await prismadb.billboard.findUnique({
+      where: { id: billboardId },
+    });
 
+    if (!billboard) {
+      return new NextResponse("Billboard not found", { status: 404 });
+    }
 
-    const billboard = await prismadb.billboard.deleteMany({
+    // 2. Delete the image from Supabase storage if it exists
+    if (billboard.imageUrl) {
+      try {
+        await deleteImage(billboard.imageUrl);
+      } catch (err) {
+        console.error("Failed to delete image from storage:", err);
+        // don’t return early, we still want to delete the DB record
+      }
+    }
+
+    await prismadb.billboard.deleteMany({
       where:{
         id:billboardId,
         

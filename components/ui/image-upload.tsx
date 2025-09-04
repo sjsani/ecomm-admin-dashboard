@@ -1,88 +1,76 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Button } from "./button";
-import { ImagePlus, Trash } from "lucide-react";
+import { useRef } from "react";
 import Image from "next/image";
-import { CldUploadWidget } from "next-cloudinary";
+import { X, Plus } from "lucide-react";
 
 interface ImageUploadProps {
+  multiple?: boolean;
   disabled?: boolean;
-  onChange: (value: string) => void;
-  onRemove: (value: string) => void;
-  value: string[];
+  value: string[]; // blob or permanent URLs
+  onChange: (urls: string[]) => void; // bubble URLs upward
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({
-  disabled,
-  onChange,
-  onRemove,
+export default function ImageUpload({
+  multiple = true,
+  disabled = false,
   value,
-}) => {
-  const [isMounted, setIsMounted] = useState(false);
+  onChange,
+}: ImageUploadProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const handleSelect = (fileList: FileList | null) => {
+    if (!fileList) return;
+    const selectedFiles = Array.from(fileList);
 
-  const handleSuccess = (result: any) => {
-    // `result.info.secure_url` only exists on "success"
-    if (result?.info?.secure_url) {
-      onChange(result.info.secure_url);
-      console.log("Upload complete:", result);
-    } else {
-      console.warn("Upload event without secure_url:", result);
-    }
+    // Create blob URLs for newly selected files
+    const blobUrls = selectedFiles.map((file) => URL.createObjectURL(file));
+
+    // Merge with existing value if multiple
+    const newValue = multiple ? [...value, ...blobUrls] : [blobUrls[0]];
+    onChange(newValue);
   };
 
-  if (!isMounted) return null;
+  const handleRemove = (index: number) => {
+    const newUrls = value.filter((_, i) => i !== index);
+    onChange(newUrls);
+  };
 
   return (
-    <div>
-      <div className="mb-4 flex items-center gap-4 flex-wrap">
-        {value.map((url) => (
-          <div
-            key={url}
-            className="relative w-[200px] h-[200px] rounded-md overflow-hidden"
+    <div className="flex flex-wrap gap-3">
+      {value.map((url, i) => (
+        <div
+          key={url + i} // avoid key collision for multiple blobs
+          className="relative w-24 h-24 rounded-md overflow-hidden border"
+        >
+          <Image src={url} alt="upload" fill className="object-cover" />
+          <button
+            type="button"
+            onClick={() => handleRemove(i)}
+            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
           >
-            <div className="absolute top-2 right-2 z-10">
-              <Button
-                type="button"
-                onClick={() => onRemove(url)}
-                variant="destructive"
-              >
-                <Trash className="w-4 h-4" />
-              </Button>
-            </div>
-            <Image fill className="object-cover" alt="image" src={url} />
-          </div>
-        ))}
-      </div>
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      ))}
 
-      <CldUploadWidget
-        uploadPreset="npqshzol"
-
-        onSuccess={handleSuccess}
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => fileInputRef.current?.click()}
+        className="w-24 h-24 border-2 border-dashed flex items-center justify-center rounded-md"
       >
-        {({ open }) => {
-          const onClick = () => {
-            open();
-          };
-          return (
-            <Button
-              type="button"
-              disabled={disabled}
-              variant="secondary"
-              onClick={onClick}
-            >
-              <ImagePlus className="h-4 w-4 mr-2" />
-              Upload an Image
-            </Button>
-          );
-        }}
-      </CldUploadWidget>
+        <Plus className="w-6 h-6 text-gray-500" />
+      </button>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple={multiple}
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => handleSelect(e.target.files)}
+      />
     </div>
   );
-};
-
-export default ImageUpload;
+}
