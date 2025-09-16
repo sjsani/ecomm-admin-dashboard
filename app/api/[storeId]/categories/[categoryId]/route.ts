@@ -17,6 +17,10 @@ export async function GET(req:Request, {params}:{params:{ categoryId:string}}) {
       where:{
         id:categoryId,
         
+      },
+      include:{
+        billboard:true
+
       }
 
     })
