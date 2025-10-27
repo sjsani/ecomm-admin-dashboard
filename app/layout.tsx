@@ -4,6 +4,7 @@ import "./globals.css";
 import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from "@clerk/nextjs";
 import { ModalProvider } from "@/providers/modal-providers";
 import { ToasterProvider } from "@/providers/toast-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,10 +35,11 @@ export default function RootLayout({
           <SignedOut>
             <RedirectToSignIn />
           </SignedOut>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ToasterProvider />
           <ModalProvider />
           {children}
-
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
