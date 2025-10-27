@@ -4,11 +4,10 @@ import { NextResponse } from "next/server";
 import { deleteImage } from "@/lib/storage/client";
 export async function GET(req:Request, {params}:{params:{ billboardId:string}}) {
 
-  const {billboardId} = await params;
    try{ 
     
     
-    if (!billboardId){
+    if (!params.billboardId){
       return new NextResponse("Billboard Id is required", {status:400})
     }
     
@@ -16,7 +15,7 @@ export async function GET(req:Request, {params}:{params:{ billboardId:string}}) 
 
     const billboard = await prismadb.billboard.findUnique({
       where:{
-        id:billboardId,
+        id:params.billboardId,
         
       }
 
@@ -31,7 +30,6 @@ export async function GET(req:Request, {params}:{params:{ billboardId:string}}) 
   
 }
 export async function PATCH(req:Request, {params}:{params:{storeId:string, billboardId:string}}) {
-  const {storeId,billboardId} = await params;
    try{ 
     const {userId} = await auth();
     const body=await req.json();
@@ -45,12 +43,12 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, billb
     if(!imageUrl){
       return new NextResponse("Image is required",{status:400})
     }
-    if (!billboardId){
+    if (!params.billboardId){
       return new NextResponse("Billboard Id is required", {status:400})
     }
     const storeByUserId = await prismadb.store.findFirst({
       where:{
-        id:storeId,
+        id:params.storeId,
         userId
 
 
@@ -64,7 +62,7 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, billb
 
     const billboard = await prismadb.billboard.updateMany({
       where:{
-        id:billboardId,
+        id:params.billboardId,
         
       },
       data:{
@@ -83,7 +81,6 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, billb
 }
 
 export async function DELETE(req:Request, {params}:{params:{storeId:string, billboardId:string}}) {
-  const {storeId,billboardId} = await params;
    try{ 
     const {userId} = await auth();
     
@@ -93,12 +90,12 @@ export async function DELETE(req:Request, {params}:{params:{storeId:string, bill
       return new NextResponse("Unauthorised User", {status:401})}
    
     
-    if (!billboardId){
+    if (!params.billboardId){
       return new NextResponse("Billboard Id is required", {status:400})
     }
     const storeByUserId = await prismadb.store.findFirst({
       where:{
-        id:storeId,
+        id:params.storeId,
         userId
 
 
@@ -110,7 +107,7 @@ export async function DELETE(req:Request, {params}:{params:{storeId:string, bill
       
     }
 const billboard = await prismadb.billboard.findUnique({
-      where: { id: billboardId },
+      where: { id: params.billboardId },
     });
 
     if (!billboard) {
@@ -129,7 +126,7 @@ const billboard = await prismadb.billboard.findUnique({
 
     await prismadb.billboard.deleteMany({
       where:{
-        id:billboardId,
+        id:params.billboardId,
         
       }
 

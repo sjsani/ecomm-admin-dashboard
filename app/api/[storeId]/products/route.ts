@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import {auth} from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb";
 export async function POST(req:Request, {params}:{params:{storeId:string}}) {
-  const {storeId} = await params
   try{
     const {userId} = await auth()
     const body = await req.json();
@@ -34,13 +33,13 @@ export async function POST(req:Request, {params}:{params:{storeId:string}}) {
       return new NextResponse("Color Id is required", {status:400})
     
     }
-    if(!storeId){
+    if(!params.storeId){
       return new NextResponse("Store Id is required", {status:400})
     
     }
     const storeByUserId = await prismadb.store.findFirst({
       where:{
-        id:storeId,
+        id:params.storeId,
         userId
 
 
@@ -60,7 +59,7 @@ const product = await prismadb.product.create({
     sizeId,
     colorId,
     categoryId,
-    storeId,
+    storeId:params.storeId,
     images: {
       createMany: {
         data: images.map((img: { url: string }) => ({ url: img.url }))
@@ -77,7 +76,6 @@ const product = await prismadb.product.create({
 }
 
 export async function GET(req:Request, {params}:{params:{storeId:string}}) {
-  const {storeId} = await params
   try{
 
 
@@ -88,7 +86,7 @@ export async function GET(req:Request, {params}:{params:{storeId:string}}) {
     const isFeatured = searchParams.get("isFeatured")
     
     
-    if(!storeId){
+    if(!params.storeId){
       return new NextResponse("Store Id is required", {status:400})
     
     }
@@ -98,7 +96,7 @@ export async function GET(req:Request, {params}:{params:{storeId:string}}) {
     const products = await prismadb.product.findMany({
       where:{
 
-        storeId:storeId,
+        storeId:params.storeId,
         categoryId,
         colorId,
         sizeId,

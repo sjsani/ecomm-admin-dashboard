@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import {auth} from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb";
 export async function POST(req:Request, {params}:{params:{storeId:string}}) {
-  const {storeId} = await params
   try{
     const {userId} = await auth()
     const body = await req.json();
@@ -19,13 +18,13 @@ export async function POST(req:Request, {params}:{params:{storeId:string}}) {
     if(!value){
       return new NextResponse("Value is required", {status:400})
     }
-    if(!storeId){
+    if(!params.storeId){
       return new NextResponse("Store Id is required", {status:400})
     
     }
     const storeByUserId = await prismadb.store.findFirst({
       where:{
-        id:storeId,
+        id:params.storeId,
         userId
 
 
@@ -40,7 +39,7 @@ export async function POST(req:Request, {params}:{params:{storeId:string}}) {
       data:{
         name,
         value,
-        storeId:storeId
+        storeId:params.storeId
       }
     });
 
@@ -52,14 +51,13 @@ export async function POST(req:Request, {params}:{params:{storeId:string}}) {
 }
 
 export async function GET(req:Request, {params}:{params:{storeId:string}}) {
-  const {storeId} = await params
   try{
 
 
   
     
     
-    if(!storeId){
+    if(!params.storeId){
       return new NextResponse("Store Id is required", {status:400})
     
     }
@@ -69,7 +67,7 @@ export async function GET(req:Request, {params}:{params:{storeId:string}}) {
     const color = await prismadb.color.findMany({
       where:{
 
-        storeId:storeId,
+        storeId:params.storeId,
       }
     });
 

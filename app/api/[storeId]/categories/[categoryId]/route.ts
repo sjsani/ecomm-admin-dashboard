@@ -3,11 +3,10 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 export async function GET(req:Request, {params}:{params:{ categoryId:string}}) {
 
-  const {categoryId} = await params;
    try{ 
     
     
-    if (!categoryId){
+    if (!params.categoryId){
       return new NextResponse("category Id is required", {status:400})
     }
     
@@ -15,7 +14,7 @@ export async function GET(req:Request, {params}:{params:{ categoryId:string}}) {
 
     const category = await prismadb.category.findUnique({
       where:{
-        id:categoryId,
+        id:params.categoryId,
         
       },
       include:{
@@ -34,7 +33,6 @@ export async function GET(req:Request, {params}:{params:{ categoryId:string}}) {
   
 }
 export async function PATCH(req:Request, {params}:{params:{storeId:string, categoryId:string}}) {
-  const {storeId,categoryId} = await params;
    try{ 
     const {userId} = await auth();
     const body=await req.json();
@@ -48,12 +46,12 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, categ
     if(!billboardId){
       return new NextResponse("Billboard ID is required",{status:400})
     }
-    if (!categoryId){
+    if (!params.categoryId){
       return new NextResponse("Category Id is required", {status:400})
     }
     const storeByUserId = await prismadb.store.findFirst({
       where:{
-        id:storeId,
+        id:params.storeId,
         userId
 
 
@@ -67,7 +65,7 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, categ
 
     const category = await prismadb.category.updateMany({
       where:{
-        id:categoryId,
+        id:params.categoryId,
         
       },
       data:{
@@ -86,7 +84,6 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, categ
 }
 
 export async function DELETE(req:Request, {params}:{params:{storeId:string, categoryId:string}}) {
-  const {storeId,categoryId} = await params;
    try{ 
     const {userId} = await auth();
     
@@ -96,12 +93,12 @@ export async function DELETE(req:Request, {params}:{params:{storeId:string, cate
       return new NextResponse("Unauthorised User", {status:401})}
    
     
-    if (!categoryId){
+    if (!params.categoryId){
       return new NextResponse("Category Id is required", {status:400})
     }
     const storeByUserId = await prismadb.store.findFirst({
       where:{
-        id:storeId,
+        id:params.storeId,
         userId
 
 
@@ -116,7 +113,7 @@ export async function DELETE(req:Request, {params}:{params:{storeId:string, cate
 
     const category = await prismadb.category.deleteMany({
       where:{
-        id:categoryId,
+        id:params.categoryId,
         
       }
 

@@ -10,10 +10,10 @@ const OrdersPage = async ({
 }:{
   params:{storeId:string}
 }) => {
-  const {storeId} = await params;
+  
   const orders = await prismadb.order.findMany({
     where:{
-      storeId: storeId
+      storeId: params.storeId
     },
     include:{
       orderItems:{

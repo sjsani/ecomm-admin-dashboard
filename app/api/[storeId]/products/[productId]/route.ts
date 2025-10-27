@@ -4,11 +4,10 @@ import { NextResponse } from "next/server";
 import { deleteImage } from "@/lib/storage/client"; 
 export async function GET(req:Request, {params}:{params:{ productId:string}}) {
 
-  const {productId} = await params;
    try{ 
     
     
-    if (!productId){
+    if (!params.productId){
       return new NextResponse("Product Id is required", {status:400})
     }
     
@@ -16,7 +15,7 @@ export async function GET(req:Request, {params}:{params:{ productId:string}}) {
 
     const product = await prismadb.product.findUnique({
       where:{
-        id:productId,
+        id:params.productId,
         
       },
       include:{
@@ -37,7 +36,6 @@ export async function GET(req:Request, {params}:{params:{ productId:string}}) {
   
 }
 export async function PATCH(req:Request, {params}:{params:{storeId:string, productId:string}}) {
-  const {storeId,productId} = await params;
    try{ 
     const {userId} = await auth();
     const body=await req.json();
@@ -67,16 +65,16 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, produ
       return new NextResponse("Color Id is required", {status:400})
     
     }
-    if(!storeId){
+    if(!params.storeId){
       return new NextResponse("Store Id is required", {status:400})
     
     }
-    if (!productId){
+    if (!params.productId){
       return new NextResponse("Product Id is required", {status:400})
     }
     const storeByUserId = await prismadb.store.findFirst({
       where:{
-        id:storeId,
+        id:params.storeId,
         userId
 
 
@@ -90,7 +88,7 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, produ
 
     await prismadb.product.update({
       where:{
-        id:productId,
+        id:params.productId,
         
       },
       data:{
@@ -101,7 +99,7 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, produ
         sizeId,
         colorId,
         categoryId,
-        storeId:storeId,
+        storeId:params.storeId,
         images:{ deleteMany:{
 
         }}
@@ -109,7 +107,7 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, produ
     })
     const product = await prismadb.product.update({
       where:{
-        id:productId
+        id:params.productId
       },
       data:{
         images:{

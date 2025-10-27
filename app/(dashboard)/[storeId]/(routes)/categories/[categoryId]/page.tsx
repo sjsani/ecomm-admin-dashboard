@@ -5,16 +5,16 @@ import { CategoryForm } from './components/CategoryForm';
 const CategoryPage = async ({
   params}:
 {params:{categoryId:string, storeId:string}}) => {
-  const {categoryId, storeId} = await params
+  
 
   const category= await prismadb.category.findUnique({
     where:{
-      id:categoryId
+      id:params.categoryId
     }
   });
   const billboards = await prismadb.billboard.findMany({
     where:{
-      storeId:storeId,
+      storeId:params.storeId,
     }
   })
   return (

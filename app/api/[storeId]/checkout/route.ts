@@ -19,7 +19,6 @@ export async function OPTIONS(){
 export async function POST(req:Request, {params}:{params:{storeId:string}}) {
 
   const {productIds} = await req.json();
-  const {storeId} = await params
   console.log("PRODUCT_IDS", productIds);
   console.log("FRONTEND_URL", process.env.FRONTEND_URL);
 
@@ -51,7 +50,7 @@ export async function POST(req:Request, {params}:{params:{storeId:string}}) {
   });
   const order = await prismadb.order.create({
     data:{
-      storeId:storeId,
+      storeId:params.storeId,
       isPaid:false,
       orderItems:{
         create: productIds.map((productId:string)=>({

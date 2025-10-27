@@ -7,23 +7,22 @@ const ProductPage = async ({
 }: {
   params: { productId: string; storeId: string };
 }) => {
-  const { productId, storeId } = await params;
 
   const product = await prismadb.product.findUnique({
-    where: { id: productId },
+    where: { id: params.productId },
     include: { images: true },
   });
 
   const categories = await prismadb.category.findMany({
-    where: { storeId },
+    where: { storeId:params.storeId },
   });
 
   const colors = await prismadb.color.findMany({
-    where: { storeId },
+    where: { storeId:params.storeId },
   });
 
   const sizes = await prismadb.size.findMany({
-    where: { storeId },
+    where: {storeId:params.storeId },
   });
 
   // Serialize product for Client Component

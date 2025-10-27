@@ -3,11 +3,10 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 export async function GET(req:Request, {params}:{params:{ sizeId:string}}) {
 
-  const {sizeId} = await params;
    try{ 
     
     
-    if (!sizeId){
+    if (!params.sizeId){
       return new NextResponse("Size Id is required", {status:400})
     }
     
@@ -15,7 +14,7 @@ export async function GET(req:Request, {params}:{params:{ sizeId:string}}) {
 
     const size = await prismadb.size.findUnique({
       where:{
-        id:sizeId,
+        id:params.sizeId,
         
       }
 
@@ -30,7 +29,6 @@ export async function GET(req:Request, {params}:{params:{ sizeId:string}}) {
   
 }
 export async function PATCH(req:Request, {params}:{params:{storeId:string, sizeId:string}}) {
-  const {storeId,sizeId} = await params;
    try{ 
     const {userId} = await auth();
     const body=await req.json();
@@ -44,12 +42,12 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, sizeI
     if(!value){
       return new NextResponse("Value is required",{status:400})
     }
-    if (!sizeId){
+    if (!params.sizeId){
       return new NextResponse("Size Id is required", {status:400})
     }
     const storeByUserId = await prismadb.store.findFirst({
       where:{
-        id:storeId,
+        id:params.storeId,
         userId
 
 
@@ -63,7 +61,7 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, sizeI
 
     const size = await prismadb.size.updateMany({
       where:{
-        id:sizeId,
+        id:params.sizeId,
         
       },
       data:{
@@ -82,7 +80,6 @@ export async function PATCH(req:Request, {params}:{params:{storeId:string, sizeI
 }
 
 export async function DELETE(req:Request, {params}:{params:{storeId:string, sizeId:string}}) {
-  const {storeId,sizeId} = await params;
    try{ 
     const {userId} = await auth();
     
@@ -92,12 +89,12 @@ export async function DELETE(req:Request, {params}:{params:{storeId:string, size
       return new NextResponse("Unauthorised User", {status:401})}
    
     
-    if (!sizeId){
+    if (!params.sizeId){
       return new NextResponse("Size Id is required", {status:400})
     }
     const storeByUserId = await prismadb.store.findFirst({
       where:{
-        id:storeId,
+        id:params.storeId,
         userId
 
 
@@ -112,7 +109,7 @@ export async function DELETE(req:Request, {params}:{params:{storeId:string, size
 
     const size = await prismadb.size.deleteMany({
       where:{
-        id:sizeId,
+        id:params.sizeId,
         
       }
 

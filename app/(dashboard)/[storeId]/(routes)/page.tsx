@@ -18,12 +18,11 @@ interface DashboardPageProps {
 }
 
 const DashboardPage: React.FC<DashboardPageProps> = async ({params}) =>{
-  const {storeId} = await params
-  const totalRevenue = await GetTotalRevenue(storeId)
-  const salesCount = await GetSalesCount(storeId)
-  const stockCount =  await GetStockCount(storeId)
+  const totalRevenue = await GetTotalRevenue(params.storeId)
+  const salesCount = await GetSalesCount(params.storeId)
+  const stockCount =  await GetStockCount(params.storeId)
 
-  const graphRevenue = await GetGraphRevenue(storeId)
+  const graphRevenue = await GetGraphRevenue(params.storeId)
 
 
   return (
