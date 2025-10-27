@@ -22,4 +22,4 @@ const BillboardPage = async ({ params }: BillboardPageProps) => {
   );
 };
 
-export default BillboardPage;
+export default BillboardPage as any;
